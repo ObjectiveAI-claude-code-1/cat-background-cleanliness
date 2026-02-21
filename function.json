@@ -1,0 +1,160 @@
+{
+  "type": "scalar.function",
+  "input_schema": {
+    "type": "object",
+    "description": "A photograph containing a cat, to be evaluated for background cleanliness — how cleanly and naturally the cat emerges as the focal point relative to its surrounding space.",
+    "properties": {
+      "cat_photo": {
+        "type": "image",
+        "description": "A photograph containing a cat. The image will be evaluated for how clean and non-distracting the background and surrounding space are in relation to the cat subject, across three qualities: visual hierarchy (whether the cat commands attention as the dominant element), distraction density (how many competing elements fracture the viewer's focus), and spatial harmony (whether the surrounding space coheres into a calm, unified visual field). The background does not need to be empty or sterile, but it must remain visually secondary to the cat."
+      }
+    },
+    "required": [
+      "cat_photo"
+    ]
+  },
+  "tasks": [
+    {
+      "type": "vector.completion",
+      "skip": null,
+      "messages": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "$jmespath": "input.cat_photo"
+            },
+            {
+              "type": "text",
+              "text": "Look at this cat photograph. When you first glance at this image, does the cat clearly stand out as the subject?"
+            }
+          ]
+        }
+      ],
+      "responses": [
+        [
+          {
+            "type": "text",
+            "text": "Yes, the cat is unmistakably the subject — my eye goes straight to it. The background stays quiet and secondary, letting the cat command the frame without any competition."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The cat is recognizable as the subject, but the background draws some attention too. There are elements that pull my focus, though the cat still holds its own."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "Not really — the cat gets lost among the other visual elements. The background is so visually assertive that the cat feels like just one part of a busy scene rather than the clear subject."
+          }
+        ]
+      ],
+      "output": {
+        "$starlark": "output['scores'][0] * 1.0 + output['scores'][1] * 0.5 + output['scores'][2] * 0.0"
+      }
+    },
+    {
+      "type": "vector.completion",
+      "skip": null,
+      "messages": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "You are a photo editor reviewing submissions for a cat photography collection. Look at the following photograph and describe the level of visual distraction in the background. Are there competing elements — scattered objects, other animals, bright signage, bold patterns — that pull attention away from the cat?"
+            },
+            {
+              "$jmespath": "input.cat_photo"
+            }
+          ]
+        }
+      ],
+      "responses": [
+        [
+          {
+            "type": "text",
+            "text": "The background is admirably clean. There are very few competing elements, and nothing that seriously challenges the cat for the viewer's attention. This background does its job well."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "There are a moderate number of distracting elements present — some objects or visual features that catch the eye — but they don't completely overwhelm the cat as the subject."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The background is heavily cluttered with distracting elements. Scattered objects, bold patterns, other animals, or other attention-grabbing presences crowd the frame and make it difficult to focus on the cat."
+          }
+        ]
+      ],
+      "output": {
+        "$starlark": "output['scores'][0] * 1.0 + output['scores'][1] * 0.5 + output['scores'][2] * 0.0"
+      }
+    },
+    {
+      "type": "vector.completion",
+      "skip": null,
+      "messages": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "$jmespath": "input.cat_photo"
+            },
+            {
+              "type": "text",
+              "text": "I'd like your opinion on this cat photograph."
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "Sure, I'd be happy to take a look at this cat photograph and share my thoughts. What would you like to know?"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "How does the space around the cat feel as a whole? Does it come together as a calm, unified backdrop, or does it feel fragmented and restless?"
+            }
+          ]
+        }
+      ],
+      "responses": [
+        [
+          {
+            "type": "text",
+            "text": "The surrounding space feels harmonious and cohesive — its elements relate to one another naturally, creating a calm, settled atmosphere that lets the viewer relax into the image and appreciate the cat as the subject."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The space has a mixed quality — some areas feel coherent and orderly while others feel somewhat haphazard, giving the backdrop an uneven character that partially supports the cat but also introduces some visual unease."
+          }
+        ],
+        [
+          {
+            "type": "text",
+            "text": "The space feels fragmented and chaotic — the elements around the cat seem randomly assembled with no visual relationship to one another, creating a sense of disorder and visual anxiety that undermines the subject."
+          }
+        ]
+      ],
+      "output": {
+        "$starlark": "output['scores'][0] * 1.0 + output['scores'][1] * 0.5 + output['scores'][2] * 0.0"
+      }
+    }
+  ],
+  "description": "Scores how clean and non-distracting the background is in a cat photograph. Evaluates visual hierarchy (does the cat dominate as subject?), distraction density (how many competing elements fracture focus?), and spatial harmony (does the space feel calm and cohesive?). Higher scores mean the background respects the cat as center of attention."
+}
